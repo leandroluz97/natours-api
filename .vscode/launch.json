@@ -1,0 +1,17 @@
+{
+  //node --inspect src/main/index.js
+  // ctrl + shift + p -> choose process -> src/main/index.js
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "name": "Launch Program",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
