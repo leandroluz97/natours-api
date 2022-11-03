@@ -6,8 +6,8 @@ const Review = require('../models/reviewModel');
 
 exports.getReview = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const tour = await Review.findById(id);
-  if (!tour) {
+  const review = await Review.findById(id);
+  if (!review) {
     return next(new AppError('No tour found with that ID', 404));
   }
   res.status(204);
@@ -23,6 +23,7 @@ exports.getReviews = catchAsync(async (req, res, next) => {
     option.tour = tourId;
   }
   const features = new APIFeatures(Review.find(option), req.query)
+    .filter()
     .limitFields()
     .pagination();
 
@@ -30,14 +31,45 @@ exports.getReviews = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
+    results: reviews.length,
     data: {
       reviews,
     },
   });
 });
 
-exports.createReview = catchAsync(async (req, res, next) => {});
+exports.createReview = catchAsync(async (req, res, next) => {
+  const newReview = await Review.create({
+    review: req.body.review,
+    rating: req.body.rating,
+    tour: req.body.tour,
+    user: req.body.user,
+  });
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      review: newReview,
+    },
+  });
+});
 
 exports.updateReview = catchAsync(async (req, res, next) => {});
 
-exports.deleteReview = catchAsync(async (req, res, next) => {});
+exports.deleteReview = catchAsync(async (req, res, next) => {
+  const { userId, reviewId } = req.params;
+
+  if (!userId || !reviewId) {
+    return next(new AppError('Missing user id or review Id', 404));
+  }
+  const review = await Review.find({ _id: reviewId, user: userId });
+
+  if (!review || review.length === 0) {
+    return next(
+      new AppError('Does not exists a review with such user id.', 404)
+    );
+  }
+
+  await Review.findByIdAndRemove(reviewId);
+  res.status(204).json({});
+});

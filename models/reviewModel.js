@@ -34,6 +34,14 @@ const reviewSchema = mongoose.Schema(
   }
 );
 
+// reviewSchema.post('save', function (doc, next) {
+//   this.populate({
+//     path: 'user',
+//     select: '-__v -passwordChangedAt',
+//   });
+//   next();
+// });
+
 const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
