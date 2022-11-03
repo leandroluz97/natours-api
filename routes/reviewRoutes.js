@@ -23,5 +23,10 @@ router.delete(
   authController.protect,
   reviewController.deleteReview
 );
+router.patch(
+  '/:reviewId',
+  authController.protect,
+  reviewController.updateReview
+);
 
 module.exports = router;
