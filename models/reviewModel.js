@@ -34,13 +34,14 @@ const reviewSchema = mongoose.Schema(
   }
 );
 
-// reviewSchema.post('save', function (doc, next) {
-//   this.populate({
-//     path: 'user',
-//     select: '-__v -passwordChangedAt',
-//   });
-//   next();
-// });
+reviewSchema.pre(/^find/, function (doc, next) {
+  // this.populate({
+  //   path: ['user, tour',
+  //   select: '-__v -passwordChangedAt',
+  // });
+  this.populate(['user, tour']);
+  next();
+});
 
 const Review = mongoose.model('Review', reviewSchema);
 

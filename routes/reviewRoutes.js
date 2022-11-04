@@ -6,23 +6,18 @@ const router = express.Router();
 
 router.post('/', authController.protect, reviewController.createReview);
 
-router.get(
-  '/user/:userId',
-  authController.protect,
-  reviewController.getReviews
-);
+router.get('/:reviewId', reviewController.getReview);
 
-router.get(
-  '/tour/:tourId',
-  authController.protect,
-  reviewController.getReviews
-);
+router.get('/user/:userId', reviewController.getReviews);
+
+router.get('/tour/:tourId', reviewController.getReviews);
 
 router.delete(
-  '/user/:userId/:reviewId',
+  '/:reviewId',
   authController.protect,
   reviewController.deleteReview
 );
+
 router.patch(
   '/:reviewId',
   authController.protect,
