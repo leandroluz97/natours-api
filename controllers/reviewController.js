@@ -6,11 +6,10 @@ const Review = require('../models/reviewModel');
 
 exports.getReview = catchAsync(async (req, res, next) => {
   const { reviewId } = req.params;
-  const review = await Review.findById('63659a804f4b3be81df523d1');
-
-  // if (!review) {
-  //   return next(new AppError('No Review found with current Id.', 404));
-  // }
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    return next(new AppError('No Review found with current Id.', 404));
+  }
   res.status(200).json({
     status: 'success',
     data: {
