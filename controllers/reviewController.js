@@ -36,7 +36,7 @@ exports.getReviews = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    results: reviews?.length,
+    results: Array.isArray(reviews) ? reviews.length : 0,
     data: {
       reviews,
     },
@@ -98,7 +98,7 @@ exports.updateReview = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteReview = catchAsync(async (req, res, next) => {
-  const { userId, reviewId } = req.params;
+  const { reviewId } = req.params;
 
   if (!req.user._id || !reviewId) {
     return next(new AppError('Missing user id or review Id', 404));
