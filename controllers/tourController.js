@@ -120,6 +120,61 @@ exports.createTour = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getToursWithin = catchAsync(async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [latitude, longitude] = latlng.split(',');
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
+  if (!latitude || !longitude) {
+    next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat, lng.',
+        400
+      )
+    );
+  }
+  const tours = await Tour.find({
+    startLocation: {
+      $geoWithin: { $centerSphere: [[longitude, latitude], radius] },
+    },
+  });
+
+  res.status(201).json({
+    status: 'success',
+    results: (tours && tours.length) || 0,
+    data: {
+      tours,
+    },
+  });
+});
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  const [latitude, longitude] = latlng.split(',');
+
+  if (!latitude || !longitude) {
+    next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat, lng.',
+        400
+      )
+    );
+  }
+  const tours = await Tour.aggregate([
+    {
+      $geoNear: {},
+    },
+  ]);
+
+  res.status(201).json({
+    status: 'success',
+    results: (tours && tours.length) || 0,
+    data: {
+      tours,
+    },
+  });
+});
+
 exports.getTourStatistics = catchAsync(async (req, res, next) => {
   const statistics = await Tour.aggregate([
     {
