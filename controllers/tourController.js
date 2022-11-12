@@ -151,7 +151,7 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
 exports.getDistances = catchAsync(async (req, res, next) => {
   const { latlng, unit } = req.params;
   const [latitude, longitude] = latlng.split(',');
-
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
   if (!latitude || !longitude) {
     next(
       new AppError(
@@ -160,17 +160,29 @@ exports.getDistances = catchAsync(async (req, res, next) => {
       )
     );
   }
-  const tours = await Tour.aggregate([
+  const distances = await Tour.aggregate([
     {
-      $geoNear: {},
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [longitude * 1, latitude * 1],
+        },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier,
+      },
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1,
+      },
     },
   ]);
 
   res.status(201).json({
     status: 'success',
-    results: (tours && tours.length) || 0,
     data: {
-      tours,
+      distances,
     },
   });
 });
