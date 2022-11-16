@@ -39,7 +39,7 @@ const limiter = rateLimit({
 });
 
 // Apply the rate limiting middleware to all requests
-app.use(limiter);
+// app.use(limiter);
 
 //Body parser, reading  data from body to req.body
 app.use(express.json({ limit: '10kb' }));
