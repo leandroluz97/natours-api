@@ -68,7 +68,7 @@ const tourSchema = mongoose.Schema(
       type: String,
       required: [true, 'Atour must have a cover image'],
     },
-    image: [String],
+    images: [String],
     secretTour: {
       type: Boolean,
       default: false,
