@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
-const xss = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 const helmet = require('helmet');
 const userRouter = require('./routes/userRoutes');
 const tourRouter = require('./routes/tourRoutes');
@@ -23,7 +23,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // MIDDLEWARE
-app.use(helmet()); // http security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  })
+); // http security headers
 
 if (process.env.NODE_ENV.trim() === 'development') {
   app.use(morgan('dev'));
