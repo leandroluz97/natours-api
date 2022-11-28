@@ -151,8 +151,8 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
     }
 
     //THE IS A LOGGED IN USER
-    req.loacals.user = currentUser;
-    next();
+    res.locals.user = currentUser;
+    return next();
   }
   next();
 });

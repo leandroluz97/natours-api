@@ -74,7 +74,7 @@ app.use(
 app.use((req, res, next) => {
   console.log('passed through');
   req.requestTime = new Date().toISOString();
-  console.log(req.cookies);
+  //   console.log(req.cookies);
   next();
 });
 
