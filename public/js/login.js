@@ -7,8 +7,12 @@ form.addEventListener('submit', (event) => {
   const password = document.querySelector('#password').value;
 
   login({ email, password })
-    .then(console.log)
-    .catch((error) => console.log(error.response.data));
+    .then(() =>
+      setTimeout(() => {
+        location.assign('/');
+      }, 1500)
+    )
+    .catch((error) => alert(error.response.data.message));
 });
 
 async function login({ email, password }) {
