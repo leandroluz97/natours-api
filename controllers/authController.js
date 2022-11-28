@@ -28,8 +28,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     expiresIn: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    secure: process.env.NODE_ENV.trim() === 'production', //send just for HTTPS
-    httpOnly: true, // cookie can't be accessed by js
+    // secure: process.env.NODE_ENV.trim() === 'production', //send just for HTTPS
+    httpOnly: false, // cookie can't be accessed by js
   };
 
   res.cookie('jwt', token, cookieOptions);
@@ -67,6 +67,16 @@ exports.login = catchAsync(async (req, res, next) => {
 
   const token = signToken(user._id);
 
+  const cookieOptions = {
+    expiresIn: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    // secure: process.env.NODE_ENV.trim() === 'production', //send just for HTTPS
+    httpOnly: false, // cookie can't be accessed by js
+  };
+
+  res.cookie('jwt', token, cookieOptions);
+
   res.status(201).json({
     status: 'success',
     token,
@@ -84,6 +94,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -113,6 +125,35 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   //GRANT ACCESS TO PROTECTED ROUTE
   req.user = currentUser;
+  next();
+});
+
+//ONLY FOR RENDERED PAGES
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  // 1) Getting token and check if its there
+  let token;
+  if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+
+    // 2) Verification token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    // 3) Check if user still exists
+    const currentUser = await User.findById(decoded.id);
+
+    if (!currentUser) {
+      return next();
+    }
+
+    // 4) Check if user changed password after the token was issued
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+
+    //THE IS A LOGGED IN USER
+    req.loacals.user = currentUser;
+    next();
+  }
   next();
 });
 
