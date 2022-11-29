@@ -1,16 +1,20 @@
 {
-  "name": "starter",
+  "name": "natours",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "source": "app.js",
   "scripts": {
     "start:dev": "SET NODE_ENV=development & nodemon server.js",
     "start:prod": "SET NODE_ENV=production & nodemon server.js",
-    "debug": "ndb server.js"
+    "debug": "ndb server.js",
+    "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js/bundle",
+    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundle"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "axios": "^1.2.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
@@ -40,6 +44,7 @@
     "eslint-plugin-react": "^7.31.8",
     "ndb": "^1.1.5",
     "nodemon": "^2.0.20",
+    "parcel": "^2.8.0",
     "prettier": "^2.7.1"
   }
 }

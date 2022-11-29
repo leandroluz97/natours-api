@@ -72,7 +72,7 @@ exports.login = catchAsync(async (req, res, next) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     // secure: process.env.NODE_ENV.trim() === 'production', //send just for HTTPS
-    httpOnly: false, // cookie can't be accessed by js
+    httpOnly: true, // cookie can't be accessed by js
   };
 
   res.cookie('jwt', token, cookieOptions);
@@ -85,6 +85,14 @@ exports.login = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
 
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check if its there
