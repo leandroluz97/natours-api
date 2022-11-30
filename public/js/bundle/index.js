@@ -534,10 +534,12 @@ function hmrAcceptRun(bundle, id) {
 },{}],"f2QDv":[function(require,module,exports) {
 /*eslint-disable */ var _polyfill = require("@babel/polyfill");
 var _login = require("./login");
+var _logout = require("./logout");
 var _mapbox = require("./mapbox");
 var _alerts = require("./alerts");
 const mapBox = document.getElementById("map");
 const loginForm = document.querySelector(".form");
+const logoutButton = document.querySelector(".nav__el--logout");
 if (mapBox) {
     const locations = JSON.parse(mapBox.dataset.locations);
     (0, _mapbox.displayMap)(locations);
@@ -556,8 +558,15 @@ if (loginForm) loginForm.addEventListener("submit", (event)=>{
         }, 1500);
     }).catch((error)=>(0, _alerts.showAlert)("error", error.response.data.message));
 });
+if (logoutButton) logoutButton.addEventListener("click", (event)=>{
+    (0, _logout.logout)().then(()=>{
+        setTimeout(()=>{
+            location.reload(true);
+        }, 1500);
+    }).catch((err)=>console.log(err));
+});
 
-},{"./login":"7yHem","@babel/polyfill":"dTCHC","./mapbox":"3zDlz","./alerts":"6Mcnf"}],"7yHem":[function(require,module,exports) {
+},{"./login":"7yHem","@babel/polyfill":"dTCHC","./mapbox":"3zDlz","./alerts":"6Mcnf","./logout":"1ftRF"}],"7yHem":[function(require,module,exports) {
 /*eslint-disable */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "login", ()=>login);
@@ -11618,6 +11627,16 @@ const showAlert = (type, message)=>{
     }, 5000);
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kaqDT","f2QDv"], "f2QDv", "parcelRequire11c7")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1ftRF":[function(require,module,exports) {
+/*eslint-disable */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "logout", ()=>logout);
+var _axios = require("axios");
+var _axiosDefault = parcelHelpers.interopDefault(_axios);
+async function logout() {
+    return await (0, _axiosDefault.default).get("http://localhost:3000/api/v1/users/logout");
+}
+
+},{"axios":"jo6P5","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kaqDT","f2QDv"], "f2QDv", "parcelRequire11c7")
 
 //# sourceMappingURL=index.js.map
