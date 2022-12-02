@@ -49,6 +49,7 @@ const limiter = rateLimit({
 
 //Body parser, reading  data from body to req.body
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' })); //Read data from html form with action and method attribute
 app.use(cookieParser());
 
 //Data sanitization  against Nosql query injection
