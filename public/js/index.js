@@ -9,6 +9,7 @@ import { updateSettings } from './updateSettings';
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('#loginForm');
 const settingsForm = document.querySelector('.form-user-data');
+const PasswordForm = document.querySelector('.form-user-settings');
 const logoutButton = document.querySelector('.nav__el--logout');
 if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);
@@ -35,30 +36,52 @@ if (loginForm) {
 }
 
 if (settingsForm) {
-  settingsForm.addEventListener('submit', (event) => {
+  settingsForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const name = document.querySelector('#name').value;
     const email = document.querySelector('#email').value;
+    try {
+      await updateSettings({ email, name });
+      showAlert('success', 'User settings updated successfully');
+    } catch (error) {
+      showAlert('error', error.response.data.message);
+    }
+  });
+}
 
-    updateSettings({ email, name })
-      .then(() => {
-        showAlert('success', 'User settings updated successfully');
-      })
-      .catch((error) => {
-        console.log(error);
-        showAlert('error', error.message);
-      });
+if (PasswordForm) {
+  PasswordForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    document.querySelector('.btn--save--password').textContent = 'Updating...';
+    const password = document.querySelector('#password-current').value;
+    const newPassword = document.querySelector('#password').value;
+    const confirmPassword = document.querySelector('#password-confirm').value;
+    try {
+      await updateSettings(
+        { password, newPassword, confirmPassword },
+        'password'
+      );
+      showAlert('success', 'User settings updated successfully');
+      document.querySelector('.btn--save--password').textContent =
+        'Save Password';
+      document.querySelector('#password-current').value = '';
+      document.querySelector('#password').value = '';
+      document.querySelector('#password-confirm').value = '';
+    } catch (error) {
+      showAlert('error', error.response.data.message);
+    }
   });
 }
 
 if (logoutButton) {
-  logoutButton.addEventListener('click', (event) => {
-    logout()
-      .then(() => {
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500);
-      })
-      .catch((err) => console.log(err));
+  logoutButton.addEventListener('click', async (event) => {
+    try {
+      await logout();
+      setTimeout(() => {
+        location.assign('/');
+      }, 1500);
+    } catch (error) {
+      console.log(err);
+    }
   });
 }

@@ -3,6 +3,9 @@
 
 # dependencies
 /.parcel-cache
+/public/bundle
+
 
 # Files
 config.env
+data.mdb

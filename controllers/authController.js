@@ -290,9 +290,18 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   user.passwordConfirm = req.body.newPasswordConfirm;
   await user.save(); //findAndUpdate() does not work validating fields
 
+  const cookieOptions = {
+    expiresIn: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    // secure: process.env.NODE_ENV.trim() === 'production', //send just for HTTPS
+    httpOnly: false, // cookie can't be accessed by js
+  };
+
   // 4) Log user in, send JWT
   const token = signToken(user._id);
 
+  res.cookie('jwt', token, cookieOptions);
   res.status(201).json({
     status: 'success',
     token,
