@@ -9,3 +9,6 @@
 # Files
 config.env
 data.mdb
+public/js/bundle/index.js.map
+public/js/bundle/index.js
+.parcel-cache/data.mdb
