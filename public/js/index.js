@@ -38,10 +38,13 @@ if (loginForm) {
 if (settingsForm) {
   settingsForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const name = document.querySelector('#name').value;
-    const email = document.querySelector('#email').value;
+    const form = new FormData();
+    form.append('name', document.querySelector('#name').value);
+    form.append('email', document.querySelector('#email').value);
+    form.append('photo', document.querySelector('#photo').files[0]);
+
     try {
-      await updateSettings({ email, name });
+      await updateSettings(form, 'data');
       showAlert('success', 'User settings updated successfully');
     } catch (error) {
       showAlert('error', error.response.data.message);
