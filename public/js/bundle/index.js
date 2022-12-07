@@ -541,6 +541,7 @@ var _updateSettings = require("./updateSettings");
 const mapBox = document.getElementById("map");
 const loginForm = document.querySelector("#loginForm");
 const settingsForm = document.querySelector(".form-user-data");
+const PasswordForm = document.querySelector(".form-user-settings");
 const logoutButton = document.querySelector(".nav__el--logout");
 if (mapBox) {
     const locations = JSON.parse(mapBox.dataset.locations);
@@ -562,26 +563,49 @@ if (loginForm) loginForm.addEventListener("submit", (event)=>{
         (0, _alerts.showAlert)("error", error.message);
     });
 });
-if (settingsForm) settingsForm.addEventListener("submit", (event)=>{
+if (settingsForm) settingsForm.addEventListener("submit", async (event)=>{
     event.preventDefault();
-    const name = document.querySelector("#name").value;
-    const email = document.querySelector("#email").value;
-    (0, _updateSettings.updateSettings)({
-        email,
-        name
-    }).then(()=>{
+    const form = new FormData();
+    form.append("name", document.querySelector("#name").value);
+    form.append("email", document.querySelector("#email").value);
+    form.append("photo", document.querySelector("#photo").files[0]);
+    try {
+        await (0, _updateSettings.updateSettings)(form, "data");
         (0, _alerts.showAlert)("success", "User settings updated successfully");
-    }).catch((error)=>{
-        console.log(error);
-        (0, _alerts.showAlert)("error", error.message);
-    });
+    } catch (error) {
+        (0, _alerts.showAlert)("error", error.response.data.message);
+    }
 });
-if (logoutButton) logoutButton.addEventListener("click", (event)=>{
-    (0, _logout.logout)().then(()=>{
+if (PasswordForm) PasswordForm.addEventListener("submit", async (event)=>{
+    event.preventDefault();
+    document.querySelector(".btn--save--password").textContent = "Updating...";
+    const password = document.querySelector("#password-current").value;
+    const newPassword = document.querySelector("#password").value;
+    const confirmPassword = document.querySelector("#password-confirm").value;
+    try {
+        await (0, _updateSettings.updateSettings)({
+            password,
+            newPassword,
+            confirmPassword
+        }, "password");
+        (0, _alerts.showAlert)("success", "User settings updated successfully");
+        document.querySelector(".btn--save--password").textContent = "Save Password";
+        document.querySelector("#password-current").value = "";
+        document.querySelector("#password").value = "";
+        document.querySelector("#password-confirm").value = "";
+    } catch (error) {
+        (0, _alerts.showAlert)("error", error.response.data.message);
+    }
+});
+if (logoutButton) logoutButton.addEventListener("click", async (event)=>{
+    try {
+        await (0, _logout.logout)();
         setTimeout(()=>{
-            location.reload(true);
+            location.assign("/");
         }, 1500);
-    }).catch((err)=>console.log(err));
+    } catch (error) {
+        console.log(err);
+    }
 });
 
 },{"@babel/polyfill":"dTCHC","./login":"7yHem","./logout":"1ftRF","./mapbox":"3zDlz","./alerts":"6Mcnf","./updateSettings":"l3cGY"}],"dTCHC":[function(require,module,exports) {
@@ -11661,9 +11685,10 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "updateSettings", ()=>updateSettings);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
-async function updateSettings(settings) {
-    if (!settings) throw new Error("You should provied new settings");
-    const response = await (0, _axiosDefault.default).patch("http://localhost:3000/me", settings);
+async function updateSettings(data, type) {
+    if (!data) throw new Error("You should provied new settings");
+    const url = type === "password" ? "http://localhost:3000/api/v1/users/new-password" : "http://localhost:3000/api/v1/users/my-account";
+    const response = await (0, _axiosDefault.default).patch(url, data);
     return response;
 }
 
