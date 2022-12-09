@@ -51,25 +51,34 @@ module.exports = class Email {
   async sendWelcome() {
     await this.send('welcome', 'Welcome to Natours APP!');
   }
+
+  async sendPasswordReset() {
+    await this.send(
+      'passwordReset',
+      'Your password reset token (valid for only 10 minutes)!'
+    );
+  }
 };
 
-const sendEmail = async (options) => {
-  // 1)  Create a transporter
-  //   const transporter = nodemailer.createTransport({
-  //     host: 'smtp.mailtrap.io',
-  //     port: 2525,
-  //     auth: {
-  //       user: 'ef89dc73cc6d74',
-  //       pass: 'b200b3040f8ace',
-  //     },
-  //   });
+//#region OLD TRANSPORTER
+// const sendEmail = async (options) => {
+// 1)  Create a transporter
+//   const transporter = nodemailer.createTransport({
+//     host: 'smtp.mailtrap.io',
+//     port: 2525,
+//     auth: {
+//       user: 'ef89dc73cc6d74',
+//       pass: 'b200b3040f8ace',
+//     },
+//   });
 
-  let info = await transporter.sendMail({
-    from: 'foo@example.com', // sender address
-    to: options.email, // list of receivers
-    subject: options.subject, // Subject line
-    text: options.message, // plain text body
-  });
-};
+//   let info = await transporter.sendMail({
+//     from: 'foo@example.com', // sender address
+//     to: options.email, // list of receivers
+//     subject: options.subject, // Subject line
+//     text: options.message, // plain text body
+//   });
+// };
 
 // module.exports = sendEmail;
+//#endregion

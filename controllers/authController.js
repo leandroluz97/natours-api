@@ -21,8 +21,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
     role: req.body.role,
   });
+
   const url = `${req.protocol}://${req.get('host')}/me`;
-  console.log(url);
   await new Email(newUser, url).sendWelcome();
 
   const token = signToken(newUser._id);
@@ -201,20 +201,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3) Send it to user's
-  //   sendEmail({
-  //     to: 'leandrodaluz97@gmail.com',
-  //     subject: 'important email',
-  //     text: 'Hi Leandro how are you doing',
-  //   });
-
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/users/reset-password/${resetToken}`;
-
-  const message = `Forgot your password? Submit a PATCH request with your new password and 
-  passwordConfirm to: ${resetURL}.\n If you didn't forget your password, please ignore this email!`;
 
   try {
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/v1/users/reset-password/${resetToken}`;
+    await new Email(user, resetURL).sendPasswordReset();
     // await sendEmail({
     //   email: user.email,
     //   subject: 'Reset Password',
