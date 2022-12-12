@@ -1,16 +1,20 @@
 /*eslint-disable */
 import '@babel/polyfill';
+
 import { login } from './login';
 import { logout } from './logout';
 import { displayMap } from './mapbox';
 import { showAlert } from './alerts';
 import { updateSettings } from './updateSettings';
+import { bookTour } from './stripe';
 
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('#loginForm');
 const settingsForm = document.querySelector('.form-user-data');
 const PasswordForm = document.querySelector('.form-user-settings');
 const logoutButton = document.querySelector('.nav__el--logout');
+const booktBtn = document.querySelector('#book-tour');
+
 if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);
   displayMap(locations);
@@ -85,6 +89,20 @@ if (logoutButton) {
       }, 1500);
     } catch (error) {
       console.log(err);
+    }
+  });
+}
+
+if (booktBtn) {
+  booktBtn.addEventListener('click', async (event) => {
+    try {
+      event.target.textContent = 'Processing...';
+      const tourId = booktBtn.getAttribute('data-tour-id');
+      const session = await bookTour(tourId);
+      event.target.textContent = 'Book Tour Now!';
+      window.location = session.data.session.url;
+    } catch (error) {
+      showAlert('error', error.response.data.message);
     }
   });
 }
