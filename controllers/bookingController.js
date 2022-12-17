@@ -4,6 +4,7 @@ const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Booking = require('../models/bookingsModel');
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get current booked tour
@@ -46,7 +47,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createBookingCheckout = catchAsync(async (req, res, next) => {
+exports.createBooking = catchAsync(async (req, res, next) => {
   // NOT SECURE
   const { tour, user, price } = req.query;
 
@@ -54,4 +55,70 @@ exports.createBookingCheckout = catchAsync(async (req, res, next) => {
   await Booking.create({ tour, user, price });
 
   res.redirect(req.originalUrl.split('?')[0]);
+});
+
+exports.getAllBookings = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(Booking.find(), req.query)
+    .filter()
+    .limitFields()
+    .pagination();
+
+  const bookings = await features.query;
+
+  res.status(200).json({
+    status: 'success',
+    results: Array.isArray(bookings) ? bookings.length : 0,
+    data: {
+      bookings,
+    },
+  });
+});
+
+exports.getBooking = catchAsync(async (req, res, next) => {
+  const { bookingId } = req.params;
+  const booking = await Booking.findById(bookingId);
+  if (!booking) {
+    return next(new AppError('No Booking found with that ID', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    results: 1,
+    data: {
+      booking,
+    },
+  });
+});
+
+exports.updateBooking = catchAsync(async (req, res, next) => {
+  const { bookingId } = req.params;
+  const booking = await Booking.findByIdAndUpdate(
+    bookingId,
+    { $set: { ...req.body } },
+    {
+      new: true,
+      runValidators: true,
+      setDefaultsOnInsert: true,
+      upsert: true,
+    }
+  );
+
+  if (!booking) {
+    return next(new AppError('No booking found with that ID', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      booking,
+    },
+  });
+});
+
+exports.deleteBooking = catchAsync(async (req, res, next) => {
+  const { bookingId } = req.params;
+  const booking = await Booking.findByIdAndRemove(bookingId);
+  if (!booking) {
+    return next(new AppError('No booking found with that ID', 404));
+  }
+  res.status(204);
 });

@@ -38,6 +38,7 @@ bookingSchema.pre(/^find/, function (next) {
     path: 'user',
     select: 'name',
   });
+
   next();
 });
 
